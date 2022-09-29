@@ -6,7 +6,6 @@ import os
 __author__ = "Mert"
 __version__ = "1.0.0"
 __date__ = "28/09/2004"
-
 wykim = Wykim()
 ready = True
 while(ready):
@@ -27,7 +26,7 @@ while(ready):
         elif mainUserInput == 2:
             #Get All Records in Database
             #Print in List Format
-            conn = sqlite3.connect("wykim/database.db")
+            conn = sqlite3.connect(wykim.dbPath)
             curr = conn.cursor()
             results = curr.execute("SELECT * FROM WorkItems").fetchall()
             
@@ -47,7 +46,7 @@ while(ready):
             workType = userInput()
             print("Enter Due Distance")
             workDue = int(userInput())
-            conn = sqlite3.connect("wykim/database.db")
+            conn = sqlite3.connect(wykim.dbPath)
             curr = conn.cursor()
             curr.execute(f"INSERT INTO WorkItems(name, type, due) VALUES (\"{workName}\", \"{workType}\", {workDue})")
             conn.commit()
@@ -61,7 +60,7 @@ while(ready):
             #Print in List Format
             #Enter Work Item: "id=14"
             #Record has been deleted
-            conn = sqlite3.connect("wykim/database.db")
+            conn = sqlite3.connect(wykim.dbPath)
             curr = conn.cursor()
             results = curr.execute("SELECT * FROM WorkItems").fetchall()
             conn.close()
@@ -71,7 +70,7 @@ while(ready):
             print("---------- >>")
             print("Enter ID (int)")
             delRecord = int(userInput())
-            delConn = sqlite3.connect("wykim/database.db")
+            delConn = sqlite3.connect(wykim.dbPath)
             delCurr = delConn.cursor()
             results = delCurr.execute(f"DELETE FROM WorkItems WHERE id={delRecord}")
             delConn.commit()
@@ -82,9 +81,6 @@ while(ready):
             print("Quitting Wykim...")
             exit()
         else:pass
-        
-               
-
     except KeyboardInterrupt:
         print("\nQuitting Wykim...")
         exit()
