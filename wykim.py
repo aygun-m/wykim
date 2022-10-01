@@ -2,9 +2,9 @@
 from wykim import Wykim
 from wykim.core import *
 import sqlite3
-import os
+import os, time
 __author__ = "Mert"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __date__ = "28/09/2004"
 wykim = Wykim()
 ready = True
@@ -14,32 +14,31 @@ while(ready):
         mainMenu()
         mainUserInput = int(userInput())
         if mainUserInput == 1:
-            #Get Priority Work Item
-            #Get Due Date
-            #priorityMenu()
-            """
-            
-            The only thing left
-            
-            """
-
-        elif mainUserInput == 2:
-            #Get All Records in Database
-            #Print in List Format
             conn = sqlite3.connect(wykim.dbPath)
             curr = conn.cursor()
             results = curr.execute("SELECT * FROM WorkItems").fetchall()
-            
-            print("---------- >>")
+            conn.close()
+            smallestAss = []
+            smallestTyp = []
+            dueDates = [x[3] for x in results]
+            smallestNum = min(dueDates)    
             for x in results:
-                print(x)
+                if x[3] == smallestNum:
+                    smallestAss.append(x[1])
+                    smallestTyp.append(x[2])
+            priorityMenu(smallestAss, smallestTyp, smallestNum)
+            print("\n----------\n\nPress Enter to return to menu")
+            input()
+        elif mainUserInput == 2:
+            conn = sqlite3.connect(wykim.dbPath)
+            curr = conn.cursor()
+            results = curr.execute("SELECT * FROM WorkItems").fetchall()
+            print("---------- >>")
+            for x in results:print(x)
             print("---------- >>\nPress Enter to return to menu")
             input()
             conn.close()
         elif mainUserInput == 3:
-            #Enter Work Type: "Assignment"
-            #Enter Due Date:  "7"
-            #Record has been added
             print("Enter Work Name")
             workName = userInput()
             print("Enter Work Type")
@@ -56,17 +55,12 @@ while(ready):
             input()            
             conn.close()
         elif mainUserInput == 4:
-            #Get All Records in Database
-            #Print in List Format
-            #Enter Work Item: "id=14"
-            #Record has been deleted
             conn = sqlite3.connect(wykim.dbPath)
             curr = conn.cursor()
             results = curr.execute("SELECT * FROM WorkItems").fetchall()
             conn.close()
             print("---------- >>")
-            for x in results:
-                print(x)
+            for x in results:print(x)
             print("---------- >>")
             print("Enter ID (int)")
             delRecord = int(userInput())
@@ -84,5 +78,6 @@ while(ready):
     except KeyboardInterrupt:
         print("\nQuitting Wykim...")
         exit()
-    
-
+    except Exception:
+        print("There was an error")
+        time.sleep(1)

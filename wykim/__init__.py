@@ -1,6 +1,4 @@
 import os
-import time
-
 class Wykim:
     def __init__(self):
         self.cwdPath = os.getcwd()
