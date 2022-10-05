@@ -3,8 +3,9 @@ from wykim import Wykim
 from wykim.core import *
 import sqlite3
 import os, time
+from datetime import datetime, timedelta
 __author__ = "Mert"
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __date__ = "28/09/2004"
 wykim = Wykim()
 ready = True
@@ -18,15 +19,10 @@ while(ready):
             curr = conn.cursor()
             results = curr.execute("SELECT * FROM WorkItems").fetchall()
             conn.close()
-            smallestAss = []
-            smallestTyp = []
-            dueDates = [x[3] for x in results]
-            smallestNum = min(dueDates)    
-            for x in results:
-                if x[3] == smallestNum:
-                    smallestAss.append(x[1])
-                    smallestTyp.append(x[2])
-            priorityMenu(smallestAss, smallestTyp, smallestNum)
+            #Find the date closest to now.
+            #timedelta can be used to add and subtract from datetime objects
+
+            #priorityMenu(priorityWork, priorityType, priorityDue)
             print("\n----------\n\nPress Enter to return to menu")
             input()
         elif mainUserInput == 2:
@@ -43,11 +39,16 @@ while(ready):
             workName = userInput()
             print("Enter Work Type")
             workType = userInput()
-            print("Enter Due Distance")
-            workDue = int(userInput())
+            print("Enter Due Date (Year)")
+            workDueYear = int(userInput())
+            print("Enter Due Date (Month)")
+            workDueMonth = int(userInput())
+            print("Enter Due Date (Day)")
+            workDueDay = int(userInput())
+            workDue = str(datetime(workDueYear, workDueMonth, workDueDay))[:10]
             conn = sqlite3.connect(wykim.dbPath)
             curr = conn.cursor()
-            curr.execute(f"INSERT INTO WorkItems(name, type, due) VALUES (\"{workName}\", \"{workType}\", {workDue})")
+            curr.execute(f"INSERT INTO WorkItems(name, type, due) VALUES (\"{workName}\", \"{workType}\", \"{workDue}\")")
             conn.commit()
             print("---------- >>")            
             print("Record has been created")
@@ -78,6 +79,3 @@ while(ready):
     except KeyboardInterrupt:
         print("\nQuitting Wykim...")
         exit()
-    except Exception:
-        print("There was an error")
-        time.sleep(1)
