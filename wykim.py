@@ -1,11 +1,10 @@
 #/usr/bin/python3
 from wykim import Wykim
 from wykim.core import *
-import sqlite3
-import os, time
+import sqlite3, os
 from datetime import datetime, timedelta
 __author__ = "Mert"
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 __date__ = "28/09/2004"
 wykim = Wykim()
 ready = True
@@ -19,10 +18,30 @@ while(ready):
             curr = conn.cursor()
             results = curr.execute("SELECT * FROM WorkItems").fetchall()
             conn.close()
-            #Find the date closest to now.
-            #timedelta can be used to add and subtract from datetime objects
-
-            #priorityMenu(priorityWork, priorityType, priorityDue)
+            currentDate = datetime.now() 
+            listOfDates = [x for x in results]
+            listOfDays = []
+            for x in listOfDates:
+                y = x[3]
+                listOfDays.append(datetime.strptime(y, "%Y-%m-%d"))
+            empList = [] 
+            for x in listOfDays:
+                i = 0
+                while(x > currentDate):
+                    x = x - timedelta(days=1)
+                    i = i + 1
+                empList.append(i)
+            minimum = min(empList) 
+            priorityWork = []
+            priorityType = []
+            priorityDue = []
+            for x in results:
+                dt = str(currentDate + timedelta(days=minimum))[:10]
+                if(x[3] == dt):
+                    priorityWork.append(x[1])
+                    priorityType.append(x[2])
+                    priorityDue.append(x[3])
+            priorityMenu(priorityWork, priorityType, minimum)
             print("\n----------\n\nPress Enter to return to menu")
             input()
         elif mainUserInput == 2:
